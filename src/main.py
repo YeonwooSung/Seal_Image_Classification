@@ -9,6 +9,9 @@ if __name__ == '__main__':
     mode = sys.argv[1]
     estimator_name = sys.argv[2]
 
+    #TODO file path of the data files!!
+    data_path = '../data'
+
     #TODO validate estimator name
 
     if mode == 'binary':
