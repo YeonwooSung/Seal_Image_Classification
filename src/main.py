@@ -1,29 +1,37 @@
-import sys
+from __future__ import division
+import argparse
+from dataLoading import load_data
+
+
+def arg_parse():
+    """
+    Parse the command line arguments by using the argparse parser.
+
+    :return parser: The argparse parser
+    """
+    parser = argparse.ArgumentParser(description='Argument parser for the Seal Image Classification')
+    parser.add_argument('--mode', dest='mode', type=str, help='binary for binary classification, and multi for multi-class classification',
+                        choices=['binary', 'multi'], default='binary')
+    parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'polinomial'], default='logistic')
+    parser.add_argument('--data_path', dest='data_path', type=str, default='../data')
+
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print('Usage: main.py [-binary | -multi] [estimator_name]')
-        exit(1)
+    args = arg_parse()
+    # get arguments by using the argparse
+    mode, estimator_name, data_path = args.mode, args.estimator, args.data_path
 
-    mode = sys.argv[1]
-    estimator_name = sys.argv[2]
+    # load data frames
+    x_train_df, y_train_df, x_test_df = load_data(data_path, mode)
 
-    #TODO file path of the data files!!
-    data_path = '../data'
-
-    #TODO validate estimator name
 
     if mode == 'binary':
         print('Start binary classification')
-    
-        #TODO
 
-    elif mode == 'multi':
-        print('Start multi-class classification')
-    
         #TODO
-
     else:
-        print('Usage: main.py [-binary | -multi] [estimator_name]')
-        exit(1)
+        print('Start multi-class classification')
+
+        #TODO
