@@ -37,7 +37,12 @@ def load_data(path, mode):
 
 
 def analyseDataFrame(df):
-    print(df.head(10))
+    """
+    Print out information that describes the given dataframe.
+
+    :param df: The target dataframe.
+    """
+    print(df.head())
     print('Shape of the dataframe: {}'.format(df.shape))
     df.info()
     print('\ndataframe.describe() : ', df.describe())
