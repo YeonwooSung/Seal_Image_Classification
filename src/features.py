@@ -37,7 +37,7 @@ def standardize_big_values_by_min_max(df, thresh=100):
 
 def mapYValues_binary(df):
     mapping = {'background': 1, 'seal': 2}
-    df.replace({'background': mapping}, inplace=True)
+    df.replace({'whitecoat': mapping}, inplace=True)
     return df
 
 

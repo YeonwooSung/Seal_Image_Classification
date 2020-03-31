@@ -6,6 +6,7 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.multiclass import OneVsOneClassifier
+from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from dataLoading import load_data
 from features import mapYValues_binary, mapYValues_multiclass, cleanData
 from learning import binaryClassification, multiclassClassification
@@ -37,8 +38,10 @@ def need_ovo(model_name):
 
 
 if __name__ == '__main__':
-    # ignore warnings by filtering the FutureWarning
+    # ignore warnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
+    warnings.filterwarnings(action='ignore', category=DataConversionWarning)
+    warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
     # generate argument parser to parse command line arguments
     args = arg_parse()
@@ -56,38 +59,42 @@ if __name__ == '__main__':
     #TODO choosing a suitable subset of features
 
     estimators = {
-        'logistic': [LogisticRegression(C=1e5), 'LogisticRegression'],
+        'logistic': [LogisticRegression(), 'LogisticRegression'],
         'sgd': [SGDClassifier(max_iter=10, random_state=42), 'Stochastic Gradient Descent'],
-        'xgb': [XGBClassifier(n_estimators=400, learning_rate=0.1, max_depth=3), 'XGBoost'],
-        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression(C=1e5)), ('SGD', SGDClassifier(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & StochasticGradientDescent'],
+        'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
+        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SGDClassifier(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & StochasticGradientDescent'],
         'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
     }
 
     # check if the program executed for the binary classification
     if mode == 'binary':
+        # get the model
+        estimator = estimators[estimator_name]
+        model = estimator[0]
         print('Start binary classification')
-        print('Algorithm = ' + estimator_name)
+        print('Algorithm = ' + estimator[1])
 
         # replace strings to numbers (1, 2)
         y_train_df = mapYValues_binary(y_train_df)
 
-        # get the model, and perform the binary classification
-        estimator = estimators[estimator_name]
-        model = estimator[0]
+        # perform the binary classification
         binaryClassification(model, x_train_df, y_train_df, x_test_df)
 
     else:
+        # get the model
+        estimator = estimators[estimator_name]
+        model = estimator[0]
+
         print('Start multi-class classification')
-        print('Algorithm = ' + estimator_name)
+        print('Algorithm = ' + estimator[1])
 
         # replace strings to numbers
         # {'background': 1, 'dead pup': 2, 'juvenile': 3, 'moulted pup': 4, 'whitecoat': 5}
         y_train_df = mapYValues_multiclass(y_train_df)
 
-        # get the model, and perform the multi-class classification
-        estimator = estimators[estimator_name]
-        model = estimator[0]
-
         if need_ovo(estimator_name):
+            # use OneVsOneClassifier so that the program could perform the multi-class classification with the linear models
             model = OneVsOneClassifier(model)
+
+        # execute the multi-class classification
         multiclassClassification(model, x_train_df, y_train_df, x_test_df)
