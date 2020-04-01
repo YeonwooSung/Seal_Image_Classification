@@ -37,11 +37,11 @@ def standardize_big_values_by_min_max(df, thresh=100):
 
 def mapYValues_binary(df):
     mapping = {'background': 1, 'seal': 2}
-    df.replace({'whitecoat': mapping}, inplace=True)
+    df.replace({'background': mapping}, inplace=True)
     return df
 
 
 def mapYValues_multiclass(df):
     mapping = {'background': 1, 'dead pup': 2, 'juvenile': 3, 'moulted pup': 4, 'whitecoat': 5}
-    df.replace({'background': mapping}, inplace=True)
+    df.replace({'whitecoat': mapping}, inplace=True)
     return df
