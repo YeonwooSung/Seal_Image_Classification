@@ -74,8 +74,10 @@ if __name__ == '__main__':
     x_train_df = cleanData(x_train_df)
     x_test_df = cleanData(x_test_df)
 
-    #TODO pca -> generate subsets
-
+    # list for the number of components of the PCA
+    pca_list = [10, 15, 20, 25, 30]
+ 
+    # generate dictionary that maps the estimator name to the corresponding ML model
     estimators = {
         'logistic': [LogisticRegression(), 'LogisticRegression'],
         'sgd': [SGDClassifier(max_iter=10, random_state=42), 'Stochastic Gradient Descent'],
@@ -95,8 +97,13 @@ if __name__ == '__main__':
         # replace strings to numbers (1, 2)
         y_train_df = mapYValues_binary(y_train_df)
 
-        # perform the binary classification
-        binaryClassification(model, x_train_df, y_train_df, x_test_df)
+        for pca_val in pca_list:
+            print('\nPCA :: # of components = {}'.format(pca_val))
+            pca_x_train = generate_feature_subset_PCA(x_train_df, n=pca_val)
+            pca_x_test = generate_feature_subset_PCA(x_test_df, n=pca_val)
+
+            # perform the binary classification
+            binaryClassification(model, pca_x_train, y_train_df, pca_x_test)
 
     else:
         # get the model
@@ -114,5 +121,10 @@ if __name__ == '__main__':
             # use OneVsOneClassifier so that the program could perform the multi-class classification with the linear models
             model = OneVsOneClassifier(model)
 
-        # execute the multi-class classification
-        multiclassClassification(model, x_train_df, y_train_df, x_test_df)
+        for pca_val in pca_list:
+            print('\nPCA :: # of components = {}'.format(pca_val))
+            pca_x_train = generate_feature_subset_PCA(x_train_df, n=pca_val)
+            pca_x_test = generate_feature_subset_PCA(x_test_df, n=pca_val)
+
+            # execute the multi-class classification
+            multiclassClassification(model, pca_x_train, y_train_df, pca_x_test)
