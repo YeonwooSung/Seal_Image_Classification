@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import VotingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+from sklearn.decomposition import PCA
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from dataLoading import load_data
@@ -33,7 +34,25 @@ def arg_parse():
     return parser.parse_args()
 
 
+def generate_feature_subset_PCA(X, n=20):
+    """
+    Generate subset of features by using PCA.
+
+    :param X: The dataset
+    :param n: The number of components for the PCA.
+    :return newX: generated feature subset
+    """
+    pca = PCA(n_components=n)
+    newX = pca.fit_transform(X)
+    return newX
+
+
 def need_ovo(model_name):
+    """
+    Check if the given model is a linear model.
+
+    :return Bool: If the given model is a linear model, then returns True. Otherwise, returns False.
+    """
     return (model_name == 'logistic') or (model_name == 'sgd')
 
 
@@ -55,8 +74,7 @@ if __name__ == '__main__':
     x_train_df = cleanData(x_train_df)
     x_test_df = cleanData(x_test_df)
 
-    #TODO analysing and visualising the data
-    #TODO choosing a suitable subset of features
+    #TODO pca -> generate subsets
 
     estimators = {
         'logistic': [LogisticRegression(), 'LogisticRegression'],
