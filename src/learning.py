@@ -3,14 +3,45 @@ from sklearn.metrics import accuracy_score
 from sklearn.base import clone
 from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import PCA
+from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score, KFold #TODO ShuffleSplit
+from sklearn.multiclass import OneVsOneClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import VotingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 import pandas as pd
 import numpy as np
+import warnings
 import matplotlib.pyplot as plt
 from dataLoading import load_data
 from features import mapYValues_binary, mapYValues_multiclass, cleanData
 
+
+
+
+def generate_estimators_dict():
+    # generate dictionary that maps the estimator name to the corresponding ML model
+    estimators = {
+        'logistic': [LogisticRegression(), 'LogisticRegression'],
+        'svc': [SVC(max_iter=10, random_state=42), 'Support Vector Machine'],
+        'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
+        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SVC(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
+        'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
+    }
+
+    return estimators
+
+
+def need_ovo(model_name):
+    """
+    Check if the given model is a linear model.
+
+    :return Bool: If the given model is a linear model, then returns True. Otherwise, returns False.
+    """
+    return (model_name == 'logistic') or (model_name == 'sgd')
 
 
 def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
@@ -74,9 +105,16 @@ def validation(model, x, y, draw_plot=True, k_val=5):
     if not draw_plot:
         return accuracy, accuracy_kfold
 
-
-    #TODO cross validation (GridSearchCV, etc)
     #TODO confusion matrix, precision, recall, f1
+
+    BIN_CLASSES = ['background', 'seal']
+    MULTI_CLASSES = ['background', 'dead pup', 'juvenile', 'moulted pup', 'whitecoat']
+    num_of_classes = len(np.unique(y))
+    classes = BIN_CLASSES if num_of_classes <= 2 else MULTI_CLASSES
+
+    # plot the confusion matrix
+    plot_confusion_matrix(y_test, pred, classes, normalize=True)
+
 
 
 def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues, path='../image/plot_confusion_matrix.png'):
@@ -137,7 +175,8 @@ def plotScoreFromN(X_test, y_test, model, path=''):
     :param y_test: target data
     :param model: model to evaluate
     :param path: file path of the generated image
-    :return: number of components for the best model
+
+    :return: Returns 1) the cross validation score 2) the number of components for the best model
     """
     ns = []
     scores = []
@@ -174,12 +213,15 @@ def plotScoreFromN(X_test, y_test, model, path=''):
     # save figure as an image file.
     plt.savefig(path)
 
-    return best_score_n
+    return best_score, best_score_n
 
 
 
 if __name__ == '__main__':
-    #TODO command line argument
+    # ignore warnings
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    warnings.filterwarnings(action='ignore', category=DataConversionWarning)
+    warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
     path = '../../data'
 
@@ -197,4 +239,38 @@ if __name__ == '__main__':
     bin_y_train_df = mapYValues_binary(bin_y_train_df)
     multi_y_train_df = mapYValues_multiclass(multi_y_train_df)
 
-    #TODO check command line argument, and execute suitable method
+    # get the dictionary of estimators
+    estimators = generate_estimators_dict()
+
+    # use for loop to iterate through the dictionary of estimators
+    for estimator_name in estimators:
+        curr = estimators[estimator_name]
+        model, description = curr[0], curr[1]
+
+        # clone model to use for multi-class classification
+        model_multi = clone(model)
+
+        print('\nAlgorithm : {}'.format(description))
+
+        # get the name of the model
+        model_name = type(model).__name__
+
+        # generate file path strings with the model name
+        path_bin = '../image/{}_binary.png'.format(model_name)
+        path_multi = '../image/{}_multi.png'.format(model_name)
+
+        best_score, best_score_n = plotScoreFromN(bin_x_train_df, bin_y_train_df, model, path=path_bin)
+        print('The best score of binary classification : {} :: PCA(n={})'.format(best_score, best_score_n))
+
+        # clean the pyplot figure to draw next figures
+        plt.clf()
+
+        if need_ovo(estimator_name):
+            # use OneVsOneClassifier so that the program could perform the multi-class classification with the linear models
+            model_multi = OneVsOneClassifier(model_multi)
+
+        best_score, best_score_n = plotScoreFromN(bin_x_train_df, bin_y_train_df, model_multi, path=path_multi)
+        print('The best score of multi-class classification : {} :: PCA(n={})'.format(best_score, best_score_n))
+
+        # clean the pyplot figure to draw next figures
+        plt.clf()

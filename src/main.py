@@ -1,17 +1,13 @@
 from __future__ import division
 import argparse
 import warnings
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.ensemble import VotingClassifier
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
 from sklearn.decomposition import PCA
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from dataLoading import load_data
 from features import mapYValues_binary, mapYValues_multiclass, cleanData
-from learning import train_and_validate_model
+from learning import train_and_validate_model, generate_estimators_dict, need_ovo
+
 
 
 def arg_parse():
@@ -48,14 +44,6 @@ def generate_feature_subset_PCA(X, n=20):
     return newX
 
 
-def need_ovo(model_name):
-    """
-    Check if the given model is a linear model.
-
-    :return Bool: If the given model is a linear model, then returns True. Otherwise, returns False.
-    """
-    return (model_name == 'logistic') or (model_name == 'sgd')
-
 
 if __name__ == '__main__':
     # ignore warnings
@@ -79,13 +67,7 @@ if __name__ == '__main__':
     pca_list = [10, 15, 20, 25, 30]
 
     # generate dictionary that maps the estimator name to the corresponding ML model
-    estimators = {
-        'logistic': [LogisticRegression(), 'LogisticRegression'],
-        'svc': [SVC(max_iter=10, random_state=42), 'Support Vector Machine'],
-        'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
-        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SVC(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
-        'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
-    }
+    estimators = generate_estimators_dict()
 
     # check if the program executed for the binary classification
     if mode == 'binary':
