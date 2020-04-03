@@ -1,7 +1,8 @@
 from __future__ import division
 import argparse
 import warnings
-from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.ensemble import VotingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
@@ -24,11 +25,11 @@ def arg_parse():
                         choices=['binary', 'multi'], default='binary')
 
     # logistic = logistic regression
-    # sgd = SGDClassifier
+    # svc = SVC
     # xgb = XGBClassifier
     # rf  = RandomForestClassifier
     # vc  = VotingClassifier
-    parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'sgd', 'xgb', 'rf', 'vc'], default='logistic')
+    parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'svc', 'xgb', 'rf', 'vc'], default='logistic')
     parser.add_argument('--data_path', dest='data_path', type=str, default='../../data')
 
     return parser.parse_args()
@@ -80,9 +81,9 @@ if __name__ == '__main__':
     # generate dictionary that maps the estimator name to the corresponding ML model
     estimators = {
         'logistic': [LogisticRegression(), 'LogisticRegression'],
-        'sgd': [SGDClassifier(max_iter=10, random_state=42), 'Stochastic Gradient Descent'],
+        'svc': [SVC(max_iter=10, random_state=42), 'Support Vector Machine'],
         'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
-        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SGDClassifier(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & StochasticGradientDescent'],
+        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SVC(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
         'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
     }
 
