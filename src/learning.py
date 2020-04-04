@@ -6,9 +6,9 @@ from sklearn.decomposition import PCA
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score, KFold #TODO ShuffleSplit
+from sklearn.metrics import precision_recall_fscore_support #TODO
 from sklearn.multiclass import OneVsOneClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import VotingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
@@ -26,13 +26,27 @@ def generate_estimators_dict():
     # generate dictionary that maps the estimator name to the corresponding ML model
     estimators = {
         'logistic': [LogisticRegression(), 'LogisticRegression'],
-        'svc': [SVC(max_iter=10, random_state=42), 'Support Vector Machine'],
+        'sgd': [SGDClassifier(max_iter=10, random_state=42), 'Stochastic Gradient Descent'],
         'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
-        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SVC(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
+        #'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SGDClassifier(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
         'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
     }
 
     return estimators
+
+
+def generate_feature_subset_PCA(X, n=20):
+    """
+    Generate subset of features by using PCA.
+
+    :param X: The dataset
+    :param n: The number of components for the PCA.
+    :return newX: generated feature subset
+    """
+    pca = PCA(n_components=n)
+    newX = pca.fit_transform(X)
+    return newX
+
 
 
 def need_ovo(model_name):
@@ -76,6 +90,7 @@ def validation(model, x, y, draw_plot=True, k_val=5):
     # clone the model to constructs a new estimator with the same parameters.
     # this cloned model will be used for the K-Fold validation.
     model_for_kfold = clone(model)
+    model_for_validation = clone(model)
 
     x_train, x_test, y_train, y_test = train_test_split(x, y)
     model.fit(x_train, y_train)
@@ -90,30 +105,57 @@ def validation(model, x, y, draw_plot=True, k_val=5):
     accuracy_kfold = 0
     kf = KFold(n_splits=k_val)
 
+    num_of_iteration = 0
+
     # loop for the K-Fold
     for train_index, test_index in kf.split(x):
-        x_train, x_test = x[train_index], x[test_index]
-        y_train, y_test = y[train_index], y[test_index]
+        x_train1, x_test1 = x[train_index], x[test_index]
+        y_train1, y_test1 = y.loc[train_index], y.loc[test_index]
 
-        model_for_kfold.fit(x_train, y_train)
-        pred = model.predict(x_test)
-        accuracy_kfold += accuracy_score(y_test, pred)
+        if len(np.unique(y_train1)) == 1:
+            continue
 
-    accuracy_kfold = (accuracy_kfold / k_val)
+        model_for_kfold.fit(x_train1, y_train1)
+        pred1 = model.predict(x_test1)
+        accuracy_kfold += accuracy_score(y_test1, pred1)
+
+    if num_of_iteration == 0:
+        accuracy_kfold = accuracy
+    else:
+        accuracy_kfold = (accuracy_kfold / num_of_iteration)
 
     # check if the function should terminate at this point.
     if not draw_plot:
         return accuracy, accuracy_kfold
 
-    #TODO confusion matrix, precision, recall, f1
+    # initialise the model to continue the validation
+    model = model_for_validation
 
     BIN_CLASSES = ['background', 'seal']
     MULTI_CLASSES = ['background', 'dead pup', 'juvenile', 'moulted pup', 'whitecoat']
     num_of_classes = len(np.unique(y))
     classes = BIN_CLASSES if num_of_classes <= 2 else MULTI_CLASSES
 
+    # get the name of the model
+    model_name = type(model).__name__
+    suffix = '_binary' if num_of_classes <= 2 else '_multi'
+    # generate file path string for the confusion matrix
+    file_path = '../image/cm_' + model_name + suffix
+
     # plot the confusion matrix
-    plot_confusion_matrix(y_test, pred, classes, normalize=True)
+    plot_confusion_matrix(y_test, pred, classes, normalize=True, path=file_path)
+
+
+    model.fit(x, y)
+    pred = model.predict(x)
+
+    # get precision, recall, and f1 score for the trained model
+    precision_val, recall_val, f_score, support = precision_recall_fscore_support(y, pred, average='macro') #TODO macro, micro, weighted, None
+    print(' - Precision = {}'.format(precision_val))
+    print(' - Recall    = {}'.format(recall_val))
+    print(' - F1 score  = {}'.format(f_score))
+
+    return accuracy, accuracy_kfold
 
 
 
@@ -269,8 +311,38 @@ if __name__ == '__main__':
             # use OneVsOneClassifier so that the program could perform the multi-class classification with the linear models
             model_multi = OneVsOneClassifier(model_multi)
 
-        best_score, best_score_n = plotScoreFromN(bin_x_train_df, bin_y_train_df, model_multi, path=path_multi)
+        best_score, best_score_n = plotScoreFromN(multi_x_train_df, multi_y_train_df, model_multi, path=path_multi)
         print('The best score of multi-class classification : {} :: PCA(n={})'.format(best_score, best_score_n))
 
         # clean the pyplot figure to draw next figures
         plt.clf()
+
+
+        # validation
+
+        print('Validation start - ' + model_name)
+
+        pca_val = 30
+
+        bin_pca_x_train = generate_feature_subset_PCA(bin_x_train_df, n=pca_val)
+        bin_pca_x_test = generate_feature_subset_PCA(bin_x_test_df, n=pca_val)
+        multi_pca_x_train = generate_feature_subset_PCA(multi_x_train_df, n=pca_val)
+        multi_pca_x_test = generate_feature_subset_PCA(multi_x_test_df, n=pca_val)
+
+        print('1) Binary classification :')
+        # do the validation for the given model with the training dataset
+        accuracy_score, accuracy_kfold = validation(model, bin_pca_x_train, bin_y_train_df)
+        # clean the pyplot figure to draw next figures
+        plt.clf()
+
+        print(' - Accuracy score of validation ......... {}'.format(accuracy_score))
+        print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
+
+        print('2) Multi-class classification :')
+        # do the validation for the given model with the training dataset
+        accuracy_score, accuracy_kfold = validation(model_multi, multi_pca_x_train, multi_y_train_df)
+        # clean the pyplot figure to draw next figures
+        plt.clf()
+
+        print(' - Accuracy score of validation ......... {}'.format(accuracy_score))
+        print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))

@@ -6,7 +6,7 @@ from sklearn.multiclass import OneVsOneClassifier
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from dataLoading import load_data
 from features import mapYValues_binary, mapYValues_multiclass, cleanData
-from learning import train_and_validate_model, generate_estimators_dict, need_ovo
+from learning import train_and_validate_model, generate_estimators_dict, need_ovo, generate_feature_subset_PCA
 
 
 
@@ -21,27 +21,14 @@ def arg_parse():
                         choices=['binary', 'multi'], default='binary')
 
     # logistic = logistic regression
-    # svc = SVC
+    # sgd = SGDClassifier
     # xgb = XGBClassifier
     # rf  = RandomForestClassifier
     # vc  = VotingClassifier
-    parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'svc', 'xgb', 'rf', 'vc'], default='logistic')
+    parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'sgd', 'xgb', 'rf', 'vc'], default='logistic')
     parser.add_argument('--data_path', dest='data_path', type=str, default='../../data')
 
     return parser.parse_args()
-
-
-def generate_feature_subset_PCA(X, n=20):
-    """
-    Generate subset of features by using PCA.
-
-    :param X: The dataset
-    :param n: The number of components for the PCA.
-    :return newX: generated feature subset
-    """
-    pca = PCA(n_components=n)
-    newX = pca.fit_transform(X)
-    return newX
 
 
 
