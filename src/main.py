@@ -51,7 +51,7 @@ if __name__ == '__main__':
     x_test_df = cleanData(x_test_df)
 
     # list for the number of components of the PCA
-    pca_list = [10, 15, 20, 25, 30]
+    pca_list = [10, 15, 20, 25, 30, 35, 40]
 
     # generate dictionary that maps the estimator name to the corresponding ML model
     estimators = generate_estimators_dict()

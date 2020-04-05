@@ -26,9 +26,9 @@ def generate_estimators_dict():
     # generate dictionary that maps the estimator name to the corresponding ML model
     estimators = {
         'logistic': [LogisticRegression(), 'LogisticRegression'],
-        'sgd': [SGDClassifier(max_iter=10, random_state=42), 'Stochastic Gradient Descent'],
-        'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3), 'XGBoost'],
-        #'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SGDClassifier(max_iter=10, random_state=42))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
+        'sgd': [SGDClassifier(max_iter=10, random_state=42, loss='modified_huber'), 'Stochastic Gradient Descent'],
+        'vc': [VotingClassifier(estimators=[('LR', LogisticRegression()), ('SGD', SGDClassifier(max_iter=10, random_state=42, loss='modified_huber'))], voting='soft'), 'Voting --> LogisticRegression & SVM'],
+        'xgb': [XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=10), 'XGBoost'],
         'rf': [RandomForestClassifier(random_state=0), 'RandomForest']
     }
 
@@ -43,9 +43,26 @@ def generate_feature_subset_PCA(X, n=20):
     :param n: The number of components for the PCA.
     :return newX: generated feature subset
     """
-    pca = PCA(n_components=n)
-    newX = pca.fit_transform(X)
-    return newX
+    X1 = X.iloc[:,0:900]
+
+    pca1 = PCA(n_components=n)
+    newX = pca1.fit_transform(X1)
+    #TODO return newX
+
+    # copy the dataframe
+    copied_X = X.copy()
+    # generate list of integers in accending order (0 to 899)
+    col_list = range(900)
+
+    # drop first 900 columns, since we got PCA list
+    copied_X = copied_X.drop(copied_X.columns[col_list], axis=1)
+
+    numpy_to_df = {}
+    for i in range(n):
+        col_name = 'Column_' + str(i)
+        copied_X[col_name] = newX[:,i]
+
+    return copied_X
 
 
 
@@ -109,7 +126,7 @@ def validation(model, x, y, draw_plot=True, k_val=5):
 
     # loop for the K-Fold
     for train_index, test_index in kf.split(x):
-        x_train1, x_test1 = x[train_index], x[test_index]
+        x_train1, x_test1 = x.loc[train_index], x.loc[test_index]
         y_train1, y_test1 = y.loc[train_index], y.loc[test_index]
 
         if len(np.unique(y_train1)) == 1:
@@ -227,7 +244,7 @@ def plotScoreFromN(X_test, y_test, model, path=''):
     best_score_n = 0
     modelNew = clone(model)
 
-    for n in range(1, 100):
+    for n in range(10, 40):
         model = make_pipeline(PCA(n_components=n), clone(modelNew))
         score = cross_val_score(model, X_test, y_test, cv=3).mean()
 
@@ -241,6 +258,8 @@ def plotScoreFromN(X_test, y_test, model, path=''):
         modelNew.fit(transf, y_test)
         y_pred = modelNew.predict(transf)
         tr_scores.append(accuracy_score(y_test, y_pred))
+
+        print('.', end='') #TODO
 
     plt.plot(ns, scores, label="Testing score")
     plt.plot(ns, tr_scores, label="Training score")
@@ -322,7 +341,8 @@ if __name__ == '__main__':
 
         print('Validation start - ' + model_name)
 
-        pca_val = 30
+        # the number of components in PCA
+        pca_val = 15
 
         bin_pca_x_train = generate_feature_subset_PCA(bin_x_train_df, n=pca_val)
         bin_pca_x_test = generate_feature_subset_PCA(bin_x_test_df, n=pca_val)
