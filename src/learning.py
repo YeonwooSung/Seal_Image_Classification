@@ -83,8 +83,8 @@ def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
     classification_mode = 'multi-class' if mode == 'multi' else mode
     print('Start validation of {} classification with PCA(n={})'.format(classification_mode, n))
     # do the validation with the given training set
-    accuracy_score, accuracy_kfold = validation(cloned_model, x_train_df, y_train_df, draw_plot=False)
-    print(' - Accuracy score of validation ......... {}'.format(accuracy_score))
+    accuracy, accuracy_kfold = validation(cloned_model, x_train_df, y_train_df, draw_plot=False)
+    print(' - Accuracy score of validation ......... {}'.format(accuracy))
     print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
 
     print('Start training model with PCA(n={})'.format(n))
@@ -103,10 +103,11 @@ def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
     print('Generated the csv file for ' + mode + ' classification with PCA(n={}) successfully'.format(n))
 
 
-def validation(model, x, y, draw_plot=True, k_val=5):
+def validation(model, x, y, draw_plot=True, k_val=3):
     # clone the model to constructs a new estimator with the same parameters.
     # this cloned model will be used for the K-Fold validation.
     model_for_kfold = clone(model)
+    model_for_kfold2 = clone(model)
     model_for_validation = clone(model)
 
     x_train, x_test, y_train, y_test = train_test_split(x, y)
@@ -122,6 +123,7 @@ def validation(model, x, y, draw_plot=True, k_val=5):
     accuracy_kfold = 0
     kf = KFold(n_splits=k_val)
 
+    # to count the number of successful iteration (the number of K-Fold iteration without error)
     num_of_iteration = 0
 
     # loop for the K-Fold
@@ -129,15 +131,20 @@ def validation(model, x, y, draw_plot=True, k_val=5):
         x_train1, x_test1 = x.loc[train_index], x.loc[test_index]
         y_train1, y_test1 = y.loc[train_index], y.loc[test_index]
 
+        # if the number of classes in the training set is equal to 1, then the model will not be trained correctly.
+        # so, we need to check if the K-Fold algorithm splitted the data into training set and testing set correctly
         if len(np.unique(y_train1)) == 1:
             continue
 
+        # fit the model, and make predictions
         model_for_kfold.fit(x_train1, y_train1)
         pred1 = model.predict(x_test1)
         accuracy_kfold += accuracy_score(y_test1, pred1)
 
+    # check the number of successful iteration
     if num_of_iteration == 0:
-        accuracy_kfold = accuracy
+        # if all K-Fold iteration failed, then calculate the cross validation score by using the cross_val_score() method
+        accuracy_kfold = cross_val_score(model_for_kfold2, x, y, cv=k_val).mean()
     else:
         accuracy_kfold = (accuracy_kfold / num_of_iteration)
 
@@ -184,10 +191,7 @@ def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, 
     source: https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
     """
     if not title:
-        if normalize:
-            title = 'Normalized confusion matrix'
-        else:
-            title = 'Confusion matrix, without normalization'
+        title = 'Normalized confusion matrix' if normalize else 'Confusion matrix, without normalization'
 
     # Compute confusion matrix
     cm = confusion_matrix(y_true, y_pred)
@@ -196,6 +200,7 @@ def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, 
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
+    # generate the figure for the subplots
     fig, ax = plt.subplots()
     im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
     ax.figure.colorbar(im, ax=ax)
@@ -237,35 +242,46 @@ def plotScoreFromN(X_test, y_test, model, path=''):
 
     :return: Returns 1) the cross validation score 2) the number of components for the best model
     """
-    ns = []
+    # list of accuracy scores
     scores = []
     tr_scores = []
-    best_score = 0
-    best_score_n = 0
-    modelNew = clone(model)
 
+    ns = [] # list of n values
+    best_score = 0  # the best accuracy score
+    best_score_n = 0  # the n value of the best accuracy score
+    modelNew = clone(model)  # cloned model
+
+    # use for loop to find the best n (num of elements) and best score for the PCA
     for n in range(10, 40):
         model = make_pipeline(PCA(n_components=n), clone(modelNew))
         score = cross_val_score(model, X_test, y_test, cv=3).mean()
 
+        # compare the current score and the best score to find the best cross validation score
         if score > best_score:
             best_score = score
             best_score_n = n
         ns.append(n)
         scores.append(score)
 
+        # transform the testing dataset by using PCA
         transf = PCA(n_components=n).fit_transform(X_test)
+        # train the model with the transformed testing dataset
         modelNew.fit(transf, y_test)
+        # make predictions
         y_pred = modelNew.predict(transf)
+        # calculate the accuracy score, and append the calculated score to the list
         tr_scores.append(accuracy_score(y_test, y_pred))
 
-        print('.', end='') #TODO
+
+    # generate plot
 
     plt.plot(ns, scores, label="Testing score")
     plt.plot(ns, tr_scores, label="Training score")
     plt.title("Number of required components as a function of model score")
     plt.xscale
-    plt.xticks(range(0,len(ns), 5))
+    smallest = ns[0] # get the first element of the ns, which is the smallest integer in the ns
+    largest = ns[(len(ns) - 1)] # get the last element of ns, which is the largest integer in the ns
+    plt.xticks(range(smallest, largest, 5))
     plt.xlabel("Number of components")
     plt.axvline(x= best_score_n, c='black', label="Best testing score (score=" + str(round(best_score, 2)) + ", x=" + str(best_score_n) + ")")
     plt.ylabel("Cross-validation score")
@@ -326,6 +342,7 @@ if __name__ == '__main__':
         # clean the pyplot figure to draw next figures
         plt.clf()
 
+        # check if the current estimator is a linear model, which requires the OneVsOne for the multi-class classification
         if need_ovo(estimator_name):
             # use OneVsOneClassifier so that the program could perform the multi-class classification with the linear models
             model_multi = OneVsOneClassifier(model_multi)
@@ -341,28 +358,34 @@ if __name__ == '__main__':
 
         print('Validation start - ' + model_name)
 
-        # the number of components in PCA
-        pca_val = 15
+        # use the best_score_n as a n value, which is the number of components for the PCA
+        pca_val = best_score_n
 
         bin_pca_x_train = generate_feature_subset_PCA(bin_x_train_df, n=pca_val)
         bin_pca_x_test = generate_feature_subset_PCA(bin_x_test_df, n=pca_val)
         multi_pca_x_train = generate_feature_subset_PCA(multi_x_train_df, n=pca_val)
         multi_pca_x_test = generate_feature_subset_PCA(multi_x_test_df, n=pca_val)
 
+
+        # Validation for the binary classification
+
         print('1) Binary classification :')
         # do the validation for the given model with the training dataset
-        accuracy_score, accuracy_kfold = validation(model, bin_pca_x_train, bin_y_train_df)
+        accuracy, accuracy_kfold = validation(model, bin_pca_x_train, bin_y_train_df)
         # clean the pyplot figure to draw next figures
         plt.clf()
 
-        print(' - Accuracy score of validation ......... {}'.format(accuracy_score))
+        print(' - Accuracy score of validation ......... {}'.format(accuracy))
         print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
+
+
+        # Validation for the multi-class classification
 
         print('2) Multi-class classification :')
         # do the validation for the given model with the training dataset
-        accuracy_score, accuracy_kfold = validation(model_multi, multi_pca_x_train, multi_y_train_df)
+        accuracy, accuracy_kfold = validation(model_multi, multi_pca_x_train, multi_y_train_df)
         # clean the pyplot figure to draw next figures
         plt.clf()
 
-        print(' - Accuracy score of validation ......... {}'.format(accuracy_score))
+        print(' - Accuracy score of validation ......... {}'.format(accuracy))
         print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
