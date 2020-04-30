@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score, KFold #TODO ShuffleSplit
-from sklearn.metrics import precision_recall_fscore_support #TODO
+from sklearn.metrics import precision_recall_fscore_support
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import VotingClassifier
@@ -47,7 +47,6 @@ def generate_feature_subset_PCA(X, n=20):
 
     pca1 = PCA(n_components=n)
     newX = pca1.fit_transform(X1)
-    #TODO return newX
 
     # copy the dataframe
     copied_X = X.copy()
