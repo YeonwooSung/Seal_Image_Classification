@@ -299,7 +299,7 @@ if __name__ == '__main__':
     warnings.filterwarnings(action='ignore', category=DataConversionWarning)
     warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
-    path = '../../data'
+    path = '../../data' #TODO
 
     # load data
     bin_x_train_df, bin_y_train_df, bin_x_test_df = load_data(path, 'binary')
