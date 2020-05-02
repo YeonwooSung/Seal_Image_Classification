@@ -1,0 +1,51 @@
+Start binary classification
+Algorithm = Voting --> LogisticRegression & SVM
+
+PCA :: # of components = 10
+Start validation of binary classification with PCA(n=10)
+ - Accuracy score of validation ......... 0.8567478942969202
+ - Accracy score of K-Fold validation ... 0.871995584215122
+Start training model with PCA(n=10)
+Generated the csv file for binary classification with PCA(n=10) successfully
+
+PCA :: # of components = 15
+Start validation of binary classification with PCA(n=15)
+ - Accuracy score of validation ......... 0.6202018903105511
+ - Accracy score of K-Fold validation ... 0.8655020039089494
+Start training model with PCA(n=15)
+Generated the csv file for binary classification with PCA(n=15) successfully
+
+PCA :: # of components = 20
+Start validation of binary classification with PCA(n=20)
+ - Accuracy score of validation ......... 0.8858098116119076
+ - Accracy score of K-Fold validation ... 0.8701790394433729
+Start training model with PCA(n=20)
+Generated the csv file for binary classification with PCA(n=20) successfully
+
+PCA :: # of components = 25
+Start validation of binary classification with PCA(n=25)
+ - Accuracy score of validation ......... 0.8857455153346622
+ - Accracy score of K-Fold validation ... 0.8782007072804964
+Start training model with PCA(n=25)
+Generated the csv file for binary classification with PCA(n=25) successfully
+
+PCA :: # of components = 30
+Start validation of binary classification with PCA(n=30)
+ - Accuracy score of validation ......... 0.5276795473542082
+ - Accracy score of K-Fold validation ... 0.8708225908702153
+Start training model with PCA(n=30)
+Generated the csv file for binary classification with PCA(n=30) successfully
+
+PCA :: # of components = 35
+Start validation of binary classification with PCA(n=35)
+ - Accuracy score of validation ......... 0.8840095158490323
+ - Accracy score of K-Fold validation ... 0.8708708138532889
+Start training model with PCA(n=35)
+Generated the csv file for binary classification with PCA(n=35) successfully
+
+PCA :: # of components = 40
+Start validation of binary classification with PCA(n=40)
+ - Accuracy score of validation ......... 0.8566835980196746
+ - Accracy score of K-Fold validation ... 0.8771718479783193
+Start training model with PCA(n=40)
+Generated the csv file for binary classification with PCA(n=40) successfully

@@ -1,0 +1,8 @@
+Start multi-class classification
+Algorithm = XGBoost
+
+PCA :: # of components = 10
+Start validation of multi-class classification with PCA(n=10)
+ - Accuracy score of validation ......... 0.9448980904005658
+ - Accracy score of K-Fold validation ... 0.9465511633720523
+Start training model with PCA(n=10)

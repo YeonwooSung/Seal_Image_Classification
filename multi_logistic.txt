@@ -1,0 +1,51 @@
+Start multi-class classification
+Algorithm = LogisticRegression
+
+PCA :: # of components = 10
+Start validation of multi-class classification with PCA(n=10)
+ - Accuracy score of validation ......... 0.8844595897897511
+ - Accracy score of K-Fold validation ... 0.8890191831590496
+Start training model with PCA(n=10)
+Generated the csv file for multi classification with PCA(n=10) successfully
+
+PCA :: # of components = 15
+Start validation of multi-class classification with PCA(n=15)
+ - Accuracy score of validation ......... 0.8894104031376583
+ - Accracy score of K-Fold validation ... 0.8908838222331766
+Start training model with PCA(n=15)
+Generated the csv file for multi classification with PCA(n=15) successfully
+
+PCA :: # of components = 20
+Start validation of multi-class classification with PCA(n=20)
+ - Accuracy score of validation ......... 0.892303735613708
+ - Accracy score of K-Fold validation ... 0.8905141103688407
+Start training model with PCA(n=20)
+Generated the csv file for multi classification with PCA(n=20) successfully
+
+PCA :: # of components = 25
+Start validation of multi-class classification with PCA(n=25)
+ - Accuracy score of validation ......... 0.8874815148202919
+ - Accracy score of K-Fold validation ... 0.8903533461614401
+Start training model with PCA(n=25)
+Generated the csv file for multi classification with PCA(n=25) successfully
+
+PCA :: # of components = 30
+Start validation of multi-class classification with PCA(n=30)
+ - Accuracy score of validation ......... 0.8904391435735871
+ - Accracy score of K-Fold validation ... 0.8924429568333302
+Start training model with PCA(n=30)
+Generated the csv file for multi classification with PCA(n=30) successfully
+
+PCA :: # of components = 35
+Start validation of multi-class classification with PCA(n=35)
+ - Accuracy score of validation ......... 0.8904391435735871
+ - Accracy score of K-Fold validation ... 0.8909641264306769
+Start training model with PCA(n=35)
+Generated the csv file for multi classification with PCA(n=35) successfully
+
+PCA :: # of components = 40
+Start validation of multi-class classification with PCA(n=40)
+ - Accuracy score of validation ......... 0.8914035877322704
+ - Accracy score of K-Fold validation ... 0.8907552035801766
+Start training model with PCA(n=40)
+Generated the csv file for multi classification with PCA(n=40) successfully

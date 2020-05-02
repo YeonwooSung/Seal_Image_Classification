@@ -1,0 +1,8 @@
+Start binary classification
+Algorithm = XGBoost
+
+PCA :: # of components = 10
+Start validation of binary classification with PCA(n=10)
+ - Accuracy score of validation ......... 0.9686877129814184
+ - Accracy score of K-Fold validation ... 0.9663706614301336
+Start training model with PCA(n=10)
