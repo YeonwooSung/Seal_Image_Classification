@@ -56,6 +56,17 @@ def generate_feature_subset_PCA(X, n=20):
     # drop first 900 columns, since we got PCA list
     copied_X = copied_X.drop(copied_X.columns[col_list], axis=1)
 
+    cols_list = copied_X.columns
+    new_cols_list = []
+    a = 0
+    for col_name in cols_list:
+        new_name = '_Column_' + str(a)
+        a += 1
+        new_cols_list.append(new_name)
+    
+    # rename the columns with new generated strings
+    copied_X.columns = new_cols_list
+
     numpy_to_df = {}
     for i in range(n):
         col_name = 'Column_' + str(i)
@@ -81,6 +92,7 @@ def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
 
     classification_mode = 'multi-class' if mode == 'multi' else mode
     print('Start validation of {} classification with PCA(n={})'.format(classification_mode, n))
+
     # do the validation with the given training set
     accuracy, accuracy_kfold = validation(cloned_model, x_train_df, y_train_df, draw_plot=False)
     print(' - Accuracy score of validation ......... {}'.format(accuracy))
