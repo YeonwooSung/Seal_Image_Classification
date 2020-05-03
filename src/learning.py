@@ -96,7 +96,7 @@ def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
     # do the validation with the given training set
     accuracy, accuracy_kfold = validation(cloned_model, x_train_df, y_train_df, draw_plot=False)
     print(' - Accuracy score of validation ......... {}'.format(accuracy))
-    print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
+    print(' - Accuracy score of K-Fold validation ... {}'.format(accuracy_kfold))
 
     print('Start training model with PCA(n={})'.format(n))
 
