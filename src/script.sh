@@ -17,13 +17,13 @@ function runMain() {
 # binary
 runMain "binary" "logistic" "../binary_logistic.txt" "Finish binary logistic"
 runMain "binary" "sgd" "../binary_sgd.txt" "Finish binary Stochastic Gradient Descent"
-runMain "binary" "xgb" "../binary_xgb.txt" "Finish binary XGBoost"
 runMain "binary" "rf" "../binary_rf.txt" "Finish binary RandomForest"
 runMain "binary" "vc" "../binary_vc.txt" "Finish binary Voting Classification"
+runMain "binary" "xgb" "../binary_xgb.txt" "Finish binary XGBoost"
 
 # multi
 runMain "multi" "logistic" "../multi_logistic.txt" "Finish multi logistic"
 runMain "multi" "sgd" "../multi_sgd.txt" "Finish multi Stochastic Gradient Descent"
-runMain "multi" "xgb" "../multi_xgb.txt" "Finish multi XGBoost"
 runMain "multi" "rf" "../multi_rf.txt" "Finish multi RandomForest"
 runMain "multi" "vc" "../multi_vc.txt" "Finish multi Voting Classification"
+runMain "multi" "xgb" "../multi_xgb.txt" "Finish multi XGBoost"
