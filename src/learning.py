@@ -17,7 +17,7 @@ import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 from dataLoading import load_data
-from features import mapYValues_binary, mapYValues_multiclass, cleanData
+from features import mapYValues_binary, mapResults_binary, mapYValues_multiclass, mapResults_multi, cleanData
 
 
 
@@ -109,8 +109,16 @@ def train_and_validate_model(model, x_train_df, y_train_df, x_test_df, mode, n):
     fileName = 'prediction_bin' if mode == 'binary' else 'prediction_multi'
     name = '../result/{}_{}.csv'.format(fileName, n)
 
+    # convert the results of prediction to dataframe
+    df = pd.DataFrame(preds, columns=['predictions'])
+
+    if mode == 'multi':
+        df = mapResults_multi(df)
+    else:
+        df = mapResults_binary(df)
+
     # save the predictions as a csv file with a suitable name
-    pd.DataFrame(preds, columns=['predictions']).to_csv(name)
+    df.to_csv(name, index=False)
     print('Generated the csv file for ' + mode + ' classification with PCA(n={}) successfully'.format(n))
 
 
@@ -311,7 +319,7 @@ if __name__ == '__main__':
     warnings.filterwarnings(action='ignore', category=DataConversionWarning)
     warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
-    path = '../../data' #TODO
+    path = '../../data' #TODO /data/CS5014-P2/
 
     # load data
     bin_x_train_df, bin_y_train_df, bin_x_test_df = load_data(path, 'binary')
@@ -387,7 +395,7 @@ if __name__ == '__main__':
         plt.clf()
 
         print(' - Accuracy score of validation ......... {}'.format(accuracy))
-        print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
+        print(' - Accuracy score of K-Fold validation ... {}'.format(accuracy_kfold))
 
 
         # Validation for the multi-class classification
@@ -399,4 +407,4 @@ if __name__ == '__main__':
         plt.clf()
 
         print(' - Accuracy score of validation ......... {}'.format(accuracy))
-        print(' - Accracy score of K-Fold validation ... {}'.format(accuracy_kfold))
+        print(' - Accuracy score of K-Fold validation ... {}'.format(accuracy_kfold))

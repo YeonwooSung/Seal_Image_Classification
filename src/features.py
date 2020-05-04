@@ -36,12 +36,48 @@ def standardize_big_values_by_min_max(df, thresh=100):
 
 
 def mapYValues_binary(df):
+    """
+    Maps the y values in the binary dataset.
+
+    :param df:  The data
+    :return df: The transformed dataset
+    """
     mapping = {'background': 1, 'seal': 2}
     df.replace({'background': mapping}, inplace=True)
     return df
 
 
+def mapResults_binary(df):
+    """
+    Maps the results of the binary classification.
+
+    :param df:  The data
+    :return df: The transformed dataset
+    """
+    mapping = {1: 'background', 2: 'seal'}
+    df.replace({'predictions': mapping}, inplace=True)
+    return df
+
+
 def mapYValues_multiclass(df):
+    """
+    Maps the y values in the multi dataset.
+
+    :param df:  The data
+    :return df: The transformed dataset
+    """
     mapping = {'background': 1, 'dead pup': 2, 'juvenile': 3, 'moulted pup': 4, 'whitecoat': 5}
     df.replace({'whitecoat': mapping}, inplace=True)
+    return df
+
+
+def mapResults_multi(df):
+    """
+    Maps the results of the multi-class classification.
+
+    :param df:  The data
+    :return df: The transformed dataset
+    """
+    mapping = {1: 'background', 2: 'dead pup', 3: 'juvenile', 4: 'moulted pup', 5: 'whitecoat'}
+    df.replace({'predictions': mapping}, inplace=True)
     return df
