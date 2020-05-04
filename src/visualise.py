@@ -132,11 +132,13 @@ def generatePearsonPlot(bin_x_train_df, bin_y_train_df, multi_x_train_df, multi_
     :param y_class: mutliclass target data
     :param path: The file path of the generated image
     """
+    num_of_components = 10
+
     plt.subplots(figsize=(18, 4))
     plt.subplot(1, 2, 1)
-    getPearsonPlot(PCA(n_components=10).fit_transform(bin_x_train_df), bin_y_train_df)
+    getPearsonPlot(PCA(n_components=num_of_components).fit_transform(bin_x_train_df), bin_y_train_df)
     plt.subplot(1, 2, 2)
-    getPearsonPlot(PCA(n_components=10).fit_transform(multi_x_train_df), multi_y_train_df)
+    getPearsonPlot(PCA(n_components=num_of_components).fit_transform(multi_x_train_df), multi_y_train_df)
     plt.savefig(path)
 
 
