@@ -152,7 +152,7 @@ if __name__ == '__main__':
         print('The first argument should be one of 1, 2, 3')
         exit(1)
 
-    path = '../../data'
+    path = '../../data' #TODO /data/CS5014-P2/
 
     # load data
     bin_x_train_df, bin_y_train_df, bin_x_test_df = load_data(path, 'binary')

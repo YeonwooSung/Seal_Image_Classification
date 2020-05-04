@@ -26,7 +26,7 @@ def arg_parse():
     # rf  = RandomForestClassifier
     # vc  = VotingClassifier
     parser.add_argument('--estimator', dest='estimator', type=str, choices=['logistic', 'sgd', 'xgb', 'rf', 'vc'], default='logistic')
-    parser.add_argument('--data_path', dest='data_path', type=str, default='../../data')
+    parser.add_argument('--data_path', dest='data_path', type=str, default='../../data') #TODO /data/CS5014-P2/
 
     return parser.parse_args()
 
