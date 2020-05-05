@@ -150,11 +150,14 @@ if __name__ == '__main__':
     mode = 1
     try:
         mode = int(sys.argv[1])
+
+        if mode < 1 or mode > 3:
+            raise Exception
     except:
         print('The first argument should be one of 1, 2, 3')
         exit(1)
 
-    path = '../../data' #TODO /data/CS5014-P2/
+    path = '/data/CS5014-P2/'
 
     # load data
     bin_x_train_df, bin_y_train_df, bin_x_test_df = load_data(path, 'binary')
@@ -177,3 +180,5 @@ if __name__ == '__main__':
         plotData(bin_x_train_df, bin_y_train_df, multi_x_train_df, multi_y_train_df)
     elif mode == 3:
         generatePearsonPlot(bin_x_train_df, bin_y_train_df, multi_x_train_df, multi_y_train_df)
+    else:
+        print('The first argument should be one of 1, 2, 3')

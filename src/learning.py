@@ -5,7 +5,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.decomposition import PCA
 from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split, cross_val_score, KFold #TODO ShuffleSplit
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
@@ -193,7 +193,7 @@ def validation(model, x, y, draw_plot=True, k_val=3):
     pred = model.predict(x)
 
     # get precision, recall, and f1 score for the trained model
-    precision_val, recall_val, f_score, support = precision_recall_fscore_support(y, pred, average='macro') #TODO macro, micro, weighted, None
+    precision_val, recall_val, f_score, support = precision_recall_fscore_support(y, pred, average='macro')
     print(' - Precision = {}'.format(precision_val))
     print(' - Recall    = {}'.format(recall_val))
     print(' - F1 score  = {}'.format(f_score))
@@ -319,7 +319,7 @@ if __name__ == '__main__':
     warnings.filterwarnings(action='ignore', category=DataConversionWarning)
     warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
-    path = '../../data' #TODO /data/CS5014-P2/
+    path = '/data/CS5014-P2/'
 
     # load data
     bin_x_train_df, bin_y_train_df, bin_x_test_df = load_data(path, 'binary')

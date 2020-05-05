@@ -11,7 +11,7 @@ def arg_parse():
     parser = argparse.ArgumentParser(description='Argument parser for the Seal Image Classification')
     parser.add_argument('--mode', dest='mode', type=str, help='binary for binary classification, and multi for multi-class classification',
                         choices=['binary', 'multi'], default='binary')
-    parser.add_argument('--data_path', dest='data_path', type=str, default='/data/CS5014-P2/') #TODO /data/CS5014-P2/
+    parser.add_argument('--data_path', dest='data_path', type=str, default='/data/CS5014-P2/')
 
     return parser.parse_args()
 
