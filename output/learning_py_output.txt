@@ -1,0 +1,87 @@
+
+Algorithm : LogisticRegression
+The best score of binary classification : 0.885997111264624 :: PCA(n=14)
+The best score of multi-class classification : 0.8811426013235778 :: PCA(n=16)
+Validation start - LogisticRegression
+1) Binary classification :
+ - Precision = 0.9009466910249548
+ - Recall    = 0.6924557161191841
+ - F1 score  = 0.7489266734072544
+ - Accuracy score of validation ......... 0.9172506911849804
+ - Accuracy score of K-Fold validation ... 0.9096906625292501
+2) Multi-class classification :
+ - Precision = 0.4616084495077747
+ - Recall    = 0.26659401564274665
+ - F1 score  = 0.2906704436002398
+ - Accuracy score of validation ......... 0.8875458110975375
+ - Accuracy score of K-Fold validation ... 0.8909481141172417
+
+Algorithm : Stochastic Gradient Descent
+The best score of binary classification : 0.7695838284464646 :: PCA(n=37)
+The best score of multi-class classification : 0.5852035952193032 :: PCA(n=30)
+Validation start - SGDClassifier
+1) Binary classification :
+ - Precision = 0.7579254047812847
+ - Recall    = 0.5188347155416154
+ - F1 score  = 0.5056352971447456
+ - Accuracy score of validation ......... 0.8227994599112711
+ - Accuracy score of K-Fold validation ... 0.8776863287943765
+2) Multi-class classification :
+ - Precision = 0.2925759200704091
+ - Recall    = 0.28050558806754955
+ - F1 score  = 0.28291404649622837
+ - Accuracy score of validation ......... 0.8325081977753488
+ - Accuracy score of K-Fold validation ... 0.8464057108205744
+
+Algorithm : Voting --> LogisticRegression & SVM
+The best score of binary classification : 0.779920253737003 :: PCA(n=10)
+The best score of multi-class classification : 0.8357951452828587 :: PCA(n=19)
+Validation start - VotingClassifier
+1) Binary classification :
+ - Precision = 0.689495061715606
+ - Recall    = 0.5998094766219765
+ - F1 score  = 0.6231947986428403
+ - Accuracy score of validation ......... 0.8731434449945348
+ - Accuracy score of K-Fold validation ... 0.866273571638129
+2) Multi-class classification :
+/anaconda3/lib/python3.7/site-packages/sklearn/metrics/classification.py:1143: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples.
+  'precision', 'predicted', average, warn_for)
+ - Precision = 0.31050392085186135
+ - Recall    = 0.24251977043978382
+ - F1 score  = 0.2538315094568246
+ - Accuracy score of validation ......... 0.8885745515334662
+ - Accuracy score of K-Fold validation ... 0.8909321607124454
+
+Algorithm : XGBoost
+The best score of binary classification : 0.9217307836015359 :: PCA(n=39)
+The best score of multi-class classification : 0.9116044725426328 :: PCA(n=39)
+Validation start - XGBClassifier
+1) Binary classification :
+ - Precision = 0.999898975056023
+ - Recall    = 0.9992928773463615
+ - F1 score  = 0.9995956709095196
+ - Accuracy score of validation ......... 0.9753745258149553
+ - Accuracy score of K-Fold validation ... 0.9699232739043305
+2) Multi-class classification :
+ - Precision = 0.9999889776798015
+ - Recall    = 0.9997359154929578
+ - F1 score  = 0.9998623592011351
+ - Accuracy score of validation ......... 0.9483057930945799
+ - Accuracy score of K-Fold validation ... 0.9483193642302061
+
+Algorithm : RandomForest
+The best score of binary classification : 0.9078102607755585 :: PCA(n=13)
+The best score of multi-class classification : 0.8998055500915946 :: PCA(n=16)
+Validation start - RandomForestClassifier
+1) Binary classification :
+ - Precision = 0.9978121971807816
+ - Recall    = 0.9869044431373171
+ - F1 score  = 0.9922746814119364
+ - Accuracy score of validation ......... 0.9588503825628496
+ - Accuracy score of K-Fold validation ... 0.9525301257301196
+2) Multi-class classification :
+ - Precision = 0.9970530798485544
+ - Recall    = 0.9554583521080335
+ - F1 score  = 0.9755306625138915
+ - Accuracy score of validation ......... 0.9339677232688227
+ - Accuracy score of K-Fold validation ... 0.9326464218182992
